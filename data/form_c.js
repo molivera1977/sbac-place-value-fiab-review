@@ -14,13 +14,15 @@ window.FORM_C = [
     ],
     explanation:"300 + 80 is 380, not 308 — 308 is 300 + 8, so the first one is False. Nine thousand fifty is 9,050 and 9 thousands + 5 ones is 9,005, so 9,050 is greater — True. 699 is less than 700 — True." },
 
-  { id:"C02", type:"entry",
+  { id:"C02",
     q:"Round 84,236 to the nearest hundred.",
+    choices:["84,000","84,200","84,300","85,000"],
     answer:"84,200",
     explanation:"The hundreds digit is 2. Look at the digit to its right: 3. Since 3 is less than 5, the hundreds digit stays the same — 84,200." },
 
-  { id:"C03", type:"entry",
+  { id:"C03",
     q:"73,&#9723;58 > 73,858 — What is the SMALLEST digit that makes this comparison true?",
+    choices:["6","7","8","9"],
     answer:"9",
     explanation:"The thousands are the same, so compare the hundreds place. The missing digit must be greater than 8. The only digit greater than 8 is 9." },
 
@@ -45,8 +47,9 @@ window.FORM_C = [
     ],
     explanation:"18,741 has 7 hundreds, so it rounds UP to 19,000 — Yes. 19,320 has 3 hundreds, so it rounds down to 19,000 — Yes. 19,555 has 5 hundreds, so it rounds up to 20,000 — No." },
 
-  { id:"C07", type:"entry",
+  { id:"C07",
     q:"Round 57,483 to the nearest thousand.",
+    choices:["57,000","57,500","58,000","60,000"],
     answer:"57,000",
     explanation:"The thousands digit is 7. Look at the hundreds digit: 4. Since 4 is less than 5, the thousands digit stays the same — 57,000. The 83 does not matter." },
 
@@ -81,8 +84,9 @@ window.FORM_C = [
     answer:"5,200 is 10 times as large as 520",
     explanation:"Every digit in 5,200 has shifted one place to the left compared with 520. Moving one place to the left makes a number 10 times as large." },
 
-  { id:"C12", type:"entry",
+  { id:"C12",
     q:"Round 819,547 to the nearest ten thousand.",
+    choices:["800,000","810,000","819,000","820,000"],
     answer:"820,000",
     explanation:"The ten thousands digit is 1. Look at the thousands digit: 9. Since 9 is 5 or more, round the ten thousands up — 820,000." },
 

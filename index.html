@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SBAC Practice: Place Value &amp; Multidigit Whole Numbers</title>
-  <link rel="stylesheet" href="style.css?v=pv1" />
+  <link rel="stylesheet" href="style.css?v=pv2" />
 </head>
 <body>
 <canvas id="confetti-canvas"></canvas>
@@ -168,8 +168,8 @@
         <button class="speak-btn" onclick="speakDir(this)">🔊</button>
         <h3 style="margin:0;">🧩 Three Kinds of Questions</h3>
       </div>
-      <p class="dir-text">Some questions are multiple choice. Some give you a table where you choose True or False, or Yes or No, for every row — you must answer every row to move on. Some ask you to type your answer, or to pick the symbol less than, greater than, or equal to. On table questions you only get the point if every row is right, just like the real test.</p>
-      <span class="timer-chip chip-blue">🧩 Multiple choice · tables · typed answers</span>
+      <p class="dir-text">Some questions are multiple choice. Some give you a table where you choose True or False, or Yes or No, for every row — you must answer every row to move on. Some ask you to pick the symbol less than, greater than, or equal to. On table questions every row is worth its own point, so you still get credit for the rows you get right.</p>
+      <span class="timer-chip chip-blue">🧩 Multiple choice · tables · symbols</span>
     </div>
 
     <div class="dir-section attempts-dir">
@@ -281,6 +281,10 @@
     <p id="final-score-sub" style="text-align:center;color:#666;margin-bottom:0;"></p>
     <span id="final-percent"></span>
     <p id="final-msg" style="font-size:1.3rem;text-align:center;"></p>
+    <div id="skill-section" class="skill-list hidden">
+      <h3>🎯 Skills to Review:</h3>
+      <div id="skill-items"></div>
+    </div>
     <div id="missed-section" class="missed-list hidden">
       <h3>📋 Questions to Review:</h3>
       <div id="missed-items"></div>
@@ -350,9 +354,10 @@
 
 </div><!-- /.container -->
 
-<script src="data/form_a.js?v=pv1"></script>
-<script src="data/form_b.js?v=pv1"></script>
-<script src="data/form_c.js?v=pv1"></script>
-<script src="script.js?v=pv1"></script>
+<script src="data/skills.js?v=pv2"></script>
+<script src="data/form_a.js?v=pv2"></script>
+<script src="data/form_b.js?v=pv2"></script>
+<script src="data/form_c.js?v=pv2"></script>
+<script src="script.js?v=pv2"></script>
 </body>
 </html>

@@ -19,13 +19,15 @@ window.FORM_A = [
     ],
     explanation:"400 + 60 is 460, not 406 — 406 is 400 + 6, so the first one is False. Three thousand forty is 3,040 and 3 thousands + 4 ones is 3,004, so 3,040 is greater — True. 899 is less than 1,000 — True." },
 
-  { id:"A02", type:"entry",
+  { id:"A02",
     q:"Round 47,382 to the nearest hundred.",
+    choices:["47,000","47,300","47,400","48,000"],
     answer:"47,400",
     explanation:"The hundreds digit is 3. Look at the digit to its right: 8. Since 8 is 5 or more, round the hundreds up — 47,400." },
 
-  { id:"A03", type:"entry",
+  { id:"A03",
     q:"58,&#9723;43 > 58,643 — What is the SMALLEST digit that makes this comparison true?",
+    choices:["5","6","7","8"],
     answer:"7",
     explanation:"The thousands are the same, so compare the hundreds place. The missing digit must be greater than 6. The smallest digit greater than 6 is 7." },
 
@@ -50,8 +52,9 @@ window.FORM_A = [
     ],
     explanation:"44,803 has 8 hundreds, so it rounds UP to 45,000 — Yes. 45,209 has 2 hundreds, so it rounds DOWN to 45,000 — Yes. 44,499 has 4 hundreds, so it rounds down to 44,000 — No." },
 
-  { id:"A07", type:"entry",
+  { id:"A07",
     q:"Round 72,614 to the nearest thousand.",
+    choices:["70,000","72,000","72,600","73,000"],
     answer:"73,000",
     explanation:"The thousands digit is 2. Look at the hundreds digit: 6. Since 6 is 5 or more, round the thousands up — 73,000." },
 
@@ -86,8 +89,9 @@ window.FORM_A = [
     answer:"2,400 is 10 times as large as 240",
     explanation:"Every digit in 2,400 has shifted one place to the left compared with 240. Moving one place to the left makes a number 10 times as large." },
 
-  { id:"A12", type:"entry",
+  { id:"A12",
     q:"Round 528,461 to the nearest ten thousand.",
+    choices:["500,000","520,000","528,000","530,000"],
     answer:"530,000",
     explanation:"The ten thousands digit is 2. Look at the thousands digit: 8. Since 8 is 5 or more, round the ten thousands up — 530,000." },
 

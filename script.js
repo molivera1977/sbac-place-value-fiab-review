@@ -29,8 +29,8 @@ const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv8CWv1yyi8NeH04now9
 let tabSwitchCount = 0;
 
 function submitScorePartial() {
-  const pct = app.currentBank.length
-    ? Math.round((app.score / app.currentBank.length) * 100) : 0;
+  const pts = bankPoints(app.currentBank);
+  const pct = pts ? Math.round((app.score / pts) * 100) : 0;
   fetch(SHEET_URL, {
     method: 'POST', mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
@@ -41,21 +41,22 @@ function submitScorePartial() {
       name:      app.studentName || 'Unknown',
       form:      'Form ' + (app.currentForm || '?'),
       score:     app.score,
-      total:     app.currentBank.length,
+      total:     pts,
       percent:   pct,
       status:    `In Progress (Q${app.currentIndex + 1}/${app.currentBank.length})`,
       done:           false,
       elapsed:        app.timerSeconds,
       tabSwitches:    tabSwitchCount,
-      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] ${m.q}`).join(' | '),
+      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
+      missedSkills:   skillTally(app.missedQuestions),
       timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
 }
 
 function submitScoreFinal() {
-  const pct = app.currentBank.length
-    ? Math.round((app.score / app.currentBank.length) * 100) : 0;
+  const pts = bankPoints(app.currentBank);
+  const pct = pts ? Math.round((app.score / pts) * 100) : 0;
   fetch(SHEET_URL, {
     method: 'POST', mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
@@ -67,13 +68,14 @@ function submitScoreFinal() {
       form:      'Form ' + (app.currentForm || '?'),
       attempt:   app.currentAttemptNum || 1,
       score:     app.score,
-      total:     app.currentBank.length,
+      total:     pts,
       percent:   pct,
       status:    'Complete',
       done:           true,
       elapsed:        app.timerSeconds,
       tabSwitches:    tabSwitchCount,
-      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] ${m.q}`).join(' | '),
+      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
+      missedSkills:   skillTally(app.missedQuestions),
       timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
@@ -268,6 +270,39 @@ function addHighlightFallback(u, spans) {
    count as correct. */
 function normalizeEntry(s) {
   return String(s == null ? '' : s).trim().toLowerCase().replace(/[,\s$]/g, '');
+}
+
+/* Points available in a bank. A grid is worth one point PER ROW,
+   so each statement is scored and reported on its own — that is
+   what makes the wrong-answer report usable for reteaching. */
+function bankPoints(bank) {
+  return (bank || []).reduce((t, q) => t + (q.type === 'grid' ? q.rows.length : 1), 0);
+}
+
+/* Group missed elements by skill, most-missed first.
+   Returns [{ skill, count }] — the reteaching list. */
+function skillBreakdown(missed) {
+  const counts = {};
+  (missed || []).forEach(m => {
+    const k = m.skill || 'Unsorted';
+    counts[k] = (counts[k] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .map(([skill, count]) => ({ skill, count }))
+    .sort((a, b) => b.count - a.count || a.skill.localeCompare(b.skill));
+}
+
+/* Flat "Rounding x3, Expanded form x1" for the Google Sheet,
+   so the column is readable even without the dashboard. */
+function skillTally(missed) {
+  return skillBreakdown(missed).map(s => `${s.skill} x${s.count}`).join(', ');
+}
+
+/* Skill tag for a scored element. Grids carry one skill per row. */
+function skillFor(q, rowIdx) {
+  const s = (window.SKILLS || {})[q.id];
+  if (Array.isArray(s)) return s[rowIdx] || s[0] || 'Unsorted';
+  return s || 'Unsorted';
 }
 
 /* Every control a student can answer with — used by the
@@ -1129,13 +1164,30 @@ const app = {
     if (this.questionLocked) return;
 
     let correct, yourAnswerStr, correctAnswerStr;
+    let pointsEarned = 0, rowsRight = 0, rowsTotal = 1;
 
     if (q.type === 'grid') {
       if (!this.gridSelections || this.gridSelections.some(v => v === null)) {
         this._warn('⚠️ Answer every row before you confirm.');
         return;
       }
-      correct = this.gridSelections.every((v, i) => v === q.rows[i].answer);
+      // Each row scores on its own and is reported on its own.
+      rowsTotal    = q.rows.length;
+      rowsRight    = q.rows.filter((r, i) => this.gridSelections[i] === r.answer).length;
+      pointsEarned = rowsRight;
+      correct      = rowsRight === rowsTotal;
+      q.rows.forEach((r, i) => {
+        if (this.gridSelections[i] !== r.answer) {
+          this.missedQuestions.push({
+            id: `${q.id}.${i + 1}`,
+            q: r.text,
+            skill: skillFor(q, i),
+            yourAnswer: this.gridSelections[i],
+            correct: r.answer,
+            explanation: q.explanation || ''
+          });
+        }
+      });
       yourAnswerStr    = q.rows.map((r, i) => `${r.text} → ${this.gridSelections[i]}`).join(' · ');
       correctAnswerStr = q.rows.map(r => `${r.text} → ${r.answer}`).join(' · ');
     } else if (q.type === 'entry') {
@@ -1154,13 +1206,19 @@ const app = {
 
     this.questionLocked = true;
 
-    if (correct) {
-      this.score++;
-      this.streak++;
-    } else {
-      this.streak = 0;
-      this.missedQuestions.push({ id: q.id, q: q.q, yourAnswer: yourAnswerStr, correct: correctAnswerStr, explanation: q.explanation || '' });
+    if (q.type !== 'grid') {
+      pointsEarned = correct ? 1 : 0;
+      if (!correct) {
+        this.missedQuestions.push({
+          id: q.id, q: q.q, skill: skillFor(q),
+          yourAnswer: yourAnswerStr, correct: correctAnswerStr,
+          explanation: q.explanation || ''
+        });
+      }
     }
+
+    this.score += pointsEarned;
+    this.streak = correct ? this.streak + 1 : 0;
 
     // Freeze the item and mark it up
     answerControls().forEach(el => { el.disabled = true; });
@@ -1183,12 +1241,17 @@ const app = {
       });
     }
 
+    const partial = q.type === 'grid' && rowsRight > 0 && rowsRight < rowsTotal;
     const fb = document.getElementById('feedback');
-    fb.className = 'feedback-box ' + (correct ? 'correct' : 'incorrect');
+    fb.className = 'feedback-box ' + (correct ? 'correct' : partial ? 'partial' : 'incorrect');
     fb.style.display = 'block';
-    fb.innerHTML = correct
-      ? `✅ <strong>Correct!</strong><br>${formatMathText(q.explanation)}`
-      : `❌ <strong>Not quite.</strong> The correct answer is: <strong>${formatMathText(correctAnswerStr)}</strong><br>${formatMathText(q.explanation)}`;
+    if (correct) {
+      fb.innerHTML = `✅ <strong>Correct!</strong>${q.type === 'grid' ? ` You got all ${rowsTotal} rows right.` : ''}<br>${formatMathText(q.explanation)}`;
+    } else if (partial) {
+      fb.innerHTML = `⚠️ <strong>${rowsRight} of ${rowsTotal} rows right.</strong> You earned ${rowsRight} ${rowsRight === 1 ? 'point' : 'points'}. Check the rows marked in red.<br>${formatMathText(q.explanation)}`;
+    } else {
+      fb.innerHTML = `❌ <strong>Not quite.</strong> The correct answer is: <strong>${formatMathText(correctAnswerStr)}</strong><br>${formatMathText(q.explanation)}`;
+    }
 
     // Feedback read-aloud button
     const fbSpeakBtn = document.createElement('button');
@@ -1248,7 +1311,7 @@ const app = {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(PVFIAB_SESSION_ID_KEY);
 
-    const total = this.currentBank.length;
+    const total = bankPoints(this.currentBank);
     const pct   = Math.round((this.score / total) * 100);
     const date  = new Date();
 
@@ -1295,13 +1358,33 @@ const app = {
     pctEl.innerHTML = `${this.score}/${total}<br><small style="font-size:0.5em;color:${pct>=70?'var(--correct)':'var(--danger)'};">${pct}% · ${letter}</small>`;
     setTimeout(() => pctEl.classList.add('revealed'), 50);
 
+    // ── Skills to reteach — grouped, most-missed first ──
+    const skillSec = document.getElementById('skill-section');
+    if (skillSec) {
+      const breakdown = skillBreakdown(this.missedQuestions);
+      if (breakdown.length) {
+        const worst = breakdown[0].count;
+        skillSec.classList.remove('hidden');
+        document.getElementById('skill-items').innerHTML = breakdown.map(s => {
+          const pctWidth = Math.round((s.count / worst) * 100);
+          return `<div class="skill-row">
+            <div class="skill-name">${s.skill}</div>
+            <div class="skill-bar-wrap"><div class="skill-bar" style="width:${pctWidth}%"></div></div>
+            <div class="skill-count">${s.count} missed</div>
+          </div>`;
+        }).join('');
+      } else {
+        skillSec.classList.add('hidden');
+      }
+    }
+
     const missedSec = document.getElementById('missed-section');
     if (this.missedQuestions.length) {
       missedSec.classList.remove('hidden');
       document.getElementById('missed-items').innerHTML =
         this.missedQuestions.map(m =>
           `<div class="missed-item">
-            <div class="mi-label">${m.id}</div>
+            <div class="mi-label">${m.id}${m.skill ? ` · <span class="mi-skill">${m.skill}</span>` : ''}</div>
             <div style="margin:3px 0;">${formatMathText(m.q)}</div>
             <div>Your answer: <span style="color:var(--danger);">${formatMathText(m.yourAnswer)}</span> &nbsp; ✅ Correct: <strong style="color:var(--correct);">${formatMathText(m.correct)}</strong></div>
             ${m.explanation ? `<div style="margin-top:5px;font-size:0.85rem;color:#555;font-style:italic;">💡 ${formatMathText(m.explanation)}</div>` : ''}

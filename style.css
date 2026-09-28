@@ -761,6 +761,31 @@ button.answer-btn.sym-btn {
 button.answer-btn.sym-btn.correct .sym-word,
 button.answer-btn.sym-btn.incorrect .sym-word { color: inherit; }
 
+/* ── SKILLS TO RETEACH (end screen) ────────────────── */
+.skill-list {
+  text-align: left;
+  background: #eef2ff;
+  border: 2px solid #a5b4fc;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+.skill-list h3 { margin: 0 0 12px; color: #3730a3; font-size: var(--fs); }
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.skill-name  { flex: 0 0 42%; font-size: 0.88rem; font-weight: bold; color: #312e81; }
+.skill-bar-wrap { flex: 1; height: 14px; background: #dbe1ff; border-radius: 7px; overflow: hidden; }
+.skill-bar   { height: 100%; background: linear-gradient(90deg, #6366f1, #a5b4fc); border-radius: 7px; }
+.skill-count { flex: 0 0 74px; text-align: right; font-size: 0.78rem; font-weight: bold; color: #4338ca; }
+.mi-skill { color: #4338ca; }
+
+/* partial credit on a grid — amber, neither right nor wrong */
+.feedback-box.partial { display: block; background: #fff3cd; border-color: #ffc107; color: #856404; }
+
 /* ── INCOMPLETE-ANSWER NUDGE ───────────────────────── */
 .answer-warning {
   margin-top: 10px;

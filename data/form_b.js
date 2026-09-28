@@ -14,13 +14,15 @@ window.FORM_B = [
     ],
     explanation:"800 + 50 is 850, not 805 — 805 is 800 + 5, so the first one is False. Five thousand seventy is 5,070 and 5 thousands + 7 ones is 5,007, so 5,070 is greater — True. 799 is less than 800 — True." },
 
-  { id:"B02", type:"entry",
+  { id:"B02",
     q:"Round 36,758 to the nearest hundred.",
+    choices:["36,000","36,700","36,800","37,000"],
     answer:"36,800",
     explanation:"The hundreds digit is 7. Look at the digit to its right: 5. Since it is 5 or more, round the hundreds up — 36,800." },
 
-  { id:"B03", type:"entry",
+  { id:"B03",
     q:"24,&#9723;19 > 24,519 — What is the SMALLEST digit that makes this comparison true?",
+    choices:["4","5","6","7"],
     answer:"6",
     explanation:"The thousands are the same, so compare the hundreds place. The missing digit must be greater than 5. The smallest digit greater than 5 is 6." },
 
@@ -45,8 +47,9 @@ window.FORM_B = [
     ],
     explanation:"27,650 has 6 hundreds, so it rounds UP to 28,000 — Yes. 28,431 has 4 hundreds, so it rounds down to 28,000 — Yes. 27,382 has 3 hundreds, so it rounds down to 27,000 — No." },
 
-  { id:"B07", type:"entry",
+  { id:"B07",
     q:"Round 85,097 to the nearest thousand.",
+    choices:["85,000","85,100","86,000","90,000"],
     answer:"85,000",
     explanation:"The thousands digit is 5. Look at the hundreds digit: 0. Since 0 is less than 5, the thousands digit stays the same — 85,000. The 97 does not matter." },
 
@@ -81,8 +84,9 @@ window.FORM_B = [
     answer:"1,700 is 10 times as large as 170",
     explanation:"Every digit in 1,700 has shifted one place to the left compared with 170. Moving one place to the left makes a number 10 times as large." },
 
-  { id:"B12", type:"entry",
+  { id:"B12",
     q:"Round 463,928 to the nearest ten thousand.",
+    choices:["400,000","460,000","464,000","470,000"],
     answer:"460,000",
     explanation:"The ten thousands digit is 6. Look at the thousands digit: 3. Since 3 is less than 5, the ten thousands digit stays the same — 460,000." },
 
