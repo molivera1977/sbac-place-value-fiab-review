@@ -154,6 +154,9 @@ function formatMathText(raw) {
   s = s.replace(/(\d+)\s+(\d+)\/(\d+)/g, (_, w, n, d) => mixed(w, n, d));
   s = s.replace(/(\d+)\/(\d+)/g, (_, n, d) => frac(n, d));
   s = s.replace(/\bx\b/g, '×');
+  // the ◻ placeholder in comparison and missing-digit items —
+  // enlarged so it reads as the slot the student has to fill
+  s = s.replace(/&#9723;/g, '<span class="cmp-box">&#9723;</span>');
   return s;
 }
 
@@ -176,6 +179,11 @@ function numToWord(n) {
 }
 function convertToSpokenText(raw) {
   return raw
+    // The \u25fb placeholder must be SPOKEN, not handed to the voice as a raw
+    // HTML entity (voices read "&#9723;" as digits, which lands exactly
+    // where the missing digit goes). "blank" names the slot without
+    // hinting at the answer.
+    .replace(/&#9723;|\u25fb/g, ' blank ')
     .replace(/\u00a0{2,}/g, ', ')
     .replace(/(\d+)\s+(\d+)\/(\d+)/g, (_, w, n, d) => {
       const dWord = denomToWord(d), nNum = parseInt(n);

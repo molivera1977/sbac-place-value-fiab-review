@@ -727,6 +727,18 @@ input.entry-input.correct   { background: #d4edda; border-color: #28a745; color:
 input.entry-input.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; }
 .entry-note { margin-top: 10px; font-size: 0.8rem; color: #8a93a3; }
 
+/* ── ◻ PLACEHOLDER IN THE QUESTION STEM ────────────── */
+/* No side margin: the comparison stems already carry real spaces
+   around the box, while the missing-digit stems ("58,◻43") need it
+   tight against the digits — it IS the hundreds digit there. */
+.cmp-box {
+  display: inline-block;
+  font-size: 1.45em;
+  line-height: 1;
+  vertical-align: -0.12em;
+  color: var(--primary);
+}
+
 /* ── < > = COMPARISON PAD ──────────────────────────── */
 .sym-pad {
   display: flex;
