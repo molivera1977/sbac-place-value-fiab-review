@@ -37,7 +37,7 @@ function submitScorePartial() {
     body: JSON.stringify({
       action:    'submit',
       game:      'pvfiab' + (app.currentForm || '?').toLowerCase() + '-review',
-      sessionId: SESSION_ID + '-' + (app.currentForm || 'x'),
+      sessionId: SESSION_ID + '-' + (app.currentForm || 'x') + '-A' + (app.currentAttemptNum || 1),
       name:      app.studentName || 'Unknown',
       form:      'Form ' + (app.currentForm || '?'),
       score:     app.score,
@@ -656,6 +656,12 @@ const app = {
     this.missedQuestions = [];
     this.currentIndex  = 0;
     this.timerSeconds  = 0;
+    // Fixed up front so the progress row and the final row share one
+    // sessionId — the Apps Script then overwrites the progress row
+    // instead of leaving it behind as a second row.
+    this.currentAttemptNum = reviewMode ? 1 :
+      JSON.parse(localStorage.getItem(SCORES_KEY) || '[]')
+        .filter(s => s.name === this.studentName && s.form === form && s.done).length + 1;
 
     const rawBank = [...window['FORM_' + form]];
 
@@ -715,6 +721,7 @@ const app = {
     this.streak         = saved.streak || 0;
     this.missedQuestions = saved.missedQuestions || [];
     this.timerSeconds   = saved.timerSeconds || 0;
+    this.currentAttemptNum = saved.currentAttemptNum || 1;
     this.show('quiz-screen');
     this.startTimer();
     this.renderQuestion();
@@ -729,7 +736,8 @@ const app = {
       score:           this.score,
       streak:          this.streak,
       missedQuestions: this.missedQuestions,
-      timerSeconds:    this.timerSeconds
+      timerSeconds:    this.timerSeconds,
+      currentAttemptNum: this.currentAttemptNum
     }));
   },
 
@@ -1316,9 +1324,7 @@ const app = {
     const date  = new Date();
 
     const scores   = JSON.parse(localStorage.getItem(SCORES_KEY) || '[]');
-    const prevDone = reviewMode ? 0 : scores.filter(s => s.name === this.studentName && s.form === this.currentForm && s.done).length;
-    const attemptNum = prevDone + 1;
-    this.currentAttemptNum = attemptNum;
+    const attemptNum = this.currentAttemptNum || 1;
 
     if (!reviewMode) {
       scores.push({
