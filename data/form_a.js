@@ -15,9 +15,9 @@ window.FORM_A = [
     rows:[
       { text:"406 = 400 + 60",                                    answer:"False" },
       { text:"three thousand forty > 3 thousands + 4 ones",       answer:"True"  },
-      { text:"eight hundred ninety-nine < one thousand",          answer:"True"  }
+      { text:"four hundred ninety-nine < five hundred",           answer:"True"  }
     ],
-    explanation:"400 + 60 is 460, not 406 — 406 is 400 + 6, so the first one is False. Three thousand forty is 3,040 and 3 thousands + 4 ones is 3,004, so 3,040 is greater — True. 899 is less than 1,000 — True." },
+    explanation:"400 + 60 is 460, not 406 — 406 is 400 + 6, so the first one is False. Three thousand forty is 3,040 and 3 thousands + 4 ones is 3,004, so 3,040 is greater — True. 499 is less than 500 — True." },
 
   { id:"A02",
     q:"Round 47,382 to the nearest hundred.",
@@ -96,7 +96,7 @@ window.FORM_A = [
     explanation:"The ten thousands digit is 2. Look at the thousands digit: 8. Since 8 is 5 or more, round the ten thousands up — 530,000." },
 
   { id:"A13",
-    q:"Nora rounded 4,872 to the nearest thousand and got 5,000. Owen rounded 4,872 to the nearest hundred and got 4,900. Both students are correct. Nora then says: \"A number rounded to the thousands place is ALWAYS greater than the same number rounded to the hundreds place.\" Which number shows that Nora is WRONG?",
+    q:"Nora rounded 4,872 to the nearest thousand and got 5,000. Owen rounded 4,872 to the nearest hundred and got 4,900. Both students are correct. Nora then says: \"Rounding to the thousands place ALWAYS gives you a bigger number than rounding that same number to the hundreds place.\" Which number shows that Nora is WRONG?",
     choices:["1,682","1,925","3,214","5,845"],
     answer:"3,214",
     explanation:"3,214 rounded to the nearest thousand is 3,000, but rounded to the nearest hundred it is 3,200. Here the thousands rounding is SMALLER, so Nora's rule is not always true. The other three numbers all round up to a greater thousand, so they support her claim instead of disproving it." },

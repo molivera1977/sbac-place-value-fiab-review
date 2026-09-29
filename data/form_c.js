@@ -91,7 +91,7 @@ window.FORM_C = [
     explanation:"The ten thousands digit is 1. Look at the thousands digit: 9. Since 9 is 5 or more, round the ten thousands up — 820,000." },
 
   { id:"C13",
-    q:"Priya rounded 3,756 to the nearest thousand and got 4,000. Lucas rounded 3,756 to the nearest hundred and got 3,800. Both students are correct. Priya then says: \"A number rounded to the thousands place is ALWAYS greater than the same number rounded to the hundreds place.\" Which number shows that Priya is WRONG?",
+    q:"Priya rounded 3,756 to the nearest thousand and got 4,000. Lucas rounded 3,756 to the nearest hundred and got 3,800. Both students are correct. Priya then says: \"Rounding to the thousands place ALWAYS gives you a bigger number than rounding that same number to the hundreds place.\" Which number shows that Priya is WRONG?",
     choices:["2,849","4,683","6,517","7,238"],
     answer:"7,238",
     explanation:"7,238 rounded to the nearest thousand is 7,000, but rounded to the nearest hundred it is 7,200. Here the thousands rounding is SMALLER, so Priya's rule is not always true. The other three numbers all round up to a greater thousand, so they support her claim instead of disproving it." },

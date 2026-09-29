@@ -91,7 +91,7 @@ window.FORM_B = [
     explanation:"The ten thousands digit is 6. Look at the thousands digit: 3. Since 3 is less than 5, the ten thousands digit stays the same — 460,000." },
 
   { id:"B13",
-    q:"Devon rounded 6,948 to the nearest thousand and got 7,000. Maya rounded 6,948 to the nearest hundred and got 6,900. Both students are correct. Devon then says: \"A number rounded to the thousands place is ALWAYS greater than the same number rounded to the hundreds place.\" Which number shows that Devon is WRONG?",
+    q:"Devon rounded 6,948 to the nearest thousand and got 7,000. Maya rounded 6,948 to the nearest hundred and got 6,900. Both students are correct. Devon then says: \"Rounding to the thousands place ALWAYS gives you a bigger number than rounding that same number to the hundreds place.\" Which number shows that Devon is WRONG?",
     choices:["2,761","4,682","5,132","8,915"],
     answer:"5,132",
     explanation:"5,132 rounded to the nearest thousand is 5,000, but rounded to the nearest hundred it is 5,100. Here the thousands rounding is SMALLER, so Devon's rule is not always true. The other three numbers all round up to a greater thousand, so they support his claim instead of disproving it." },
