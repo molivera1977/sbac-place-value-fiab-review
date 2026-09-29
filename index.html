@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SBAC Practice: Place Value &amp; Multidigit Whole Numbers</title>
-  <link rel="stylesheet" href="style.css?v=pv2" />
+  <link rel="stylesheet" href="style.css?v=pv3" />
 </head>
 <body>
 <canvas id="confetti-canvas"></canvas>
@@ -14,17 +14,35 @@
 ══════════════════════════════════════════ -->
 <div class="container">
   <h1>🔢 SBAC Practice: Place Value &amp; Big Numbers</h1>
-  <p class="welcome-sub">Smarter Balanced Interim Practice · Place Value &amp; Multidigit Whole Numbers</p>
+  <p class="welcome-sub">Smarter Balanced FIAB Practice · Place Value &amp; Multidigit Whole Numbers</p>
 
   <div id="start-screen">
 
     <!-- WELCOME PANEL -->
-    <div id="welcome-panel" style="text-align:center;padding:10px 0 24px;">
-      <p style="font-size:1.05rem;color:#777;margin:0 auto 28px;max-width:400px;line-height:1.8;">
-        Practice the kinds of questions you'll see on the real SBAC test:<br>
-        place value, expanded form, comparing, and rounding big numbers.<br>
-        You'll get instant feedback on every question!
-      </p>
+    <div id="welcome-panel" style="text-align:center;padding:4px 0 24px;">
+
+      <!-- Place-value hero: the topic, shown rather than described -->
+      <div class="pv-hero" role="img" aria-label="The number 528,461 shown in a place value chart">
+        <div class="pv-col p6"><span class="pv-digit">5</span><span class="pv-place">hundred<br>thousands</span></div>
+        <div class="pv-col p5"><span class="pv-digit">2</span><span class="pv-place">ten<br>thousands</span></div>
+        <div class="pv-col p4"><span class="pv-digit">8</span><span class="pv-place">thousands</span></div>
+        <span class="pv-comma">,</span>
+        <div class="pv-col p3"><span class="pv-digit">4</span><span class="pv-place">hundreds</span></div>
+        <div class="pv-col p2"><span class="pv-digit">6</span><span class="pv-place">tens</span></div>
+        <div class="pv-col p1"><span class="pv-digit">1</span><span class="pv-place">ones</span></div>
+      </div>
+
+      <p class="welcome-lead">Big numbers, one place at a time.</p>
+
+      <div class="pv-chips">
+        <span class="pv-chip c1">🔢 Place value</span>
+        <span class="pv-chip c2">➕ Expanded form</span>
+        <span class="pv-chip c3">⚖️ Comparing</span>
+        <span class="pv-chip c4">🎯 Rounding</span>
+      </div>
+
+      <p class="welcome-note">Real SBAC question styles · instant feedback on every one</p>
+
       <button class="lgs-btn" onclick="app.showReadAloudIntro()">🚀 Let's Get Started!</button>
       <div style="text-align:right;margin-top:10px;">
         <span onclick="app.promptTeacherReview()" style="font-size:0.72rem;color:#bbb;cursor:pointer;user-select:none;">Teacher Access</span>
@@ -354,10 +372,10 @@
 
 </div><!-- /.container -->
 
-<script src="data/skills.js?v=pv2"></script>
-<script src="data/form_a.js?v=pv2"></script>
-<script src="data/form_b.js?v=pv2"></script>
-<script src="data/form_c.js?v=pv2"></script>
-<script src="script.js?v=pv2"></script>
+<script src="data/skills.js?v=pv3"></script>
+<script src="data/form_a.js?v=pv3"></script>
+<script src="data/form_b.js?v=pv3"></script>
+<script src="data/form_c.js?v=pv3"></script>
+<script src="script.js?v=pv3"></script>
 </body>
 </html>
