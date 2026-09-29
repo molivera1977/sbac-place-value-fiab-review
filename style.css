@@ -83,13 +83,16 @@ h1 {
   box-shadow: 0 4px 0 rgba(0,0,0,0.18);
   animation: pvDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
-/* deepest place = deepest blue, stepping lighter down to the ones */
-.pv-col.p6 { background:#1e3a8a; animation-delay:0.00s; }
-.pv-col.p5 { background:#1d4ed8; animation-delay:0.06s; }
-.pv-col.p4 { background:#2563eb; animation-delay:0.12s; }
-.pv-col.p3 { background:#3b82f6; animation-delay:0.20s; }
-.pv-col.p2 { background:#60a5fa; animation-delay:0.26s; }
-.pv-col.p1 { background:#93c5fd; animation-delay:0.32s; color:#13294f; }
+/* Deepest place = deepest blue, stepping lighter down to the ones.
+   The range stops at #2563eb: every card stays dark enough for the
+   digits AND the small place labels to be white at 4.5:1 or better,
+   so all six numbers read as one colour. */
+.pv-col.p6 { background:#172554; animation-delay:0.00s; }
+.pv-col.p5 { background:#1e3a8a; animation-delay:0.06s; }
+.pv-col.p4 { background:#1e40af; animation-delay:0.12s; }
+.pv-col.p3 { background:#1d4ed8; animation-delay:0.20s; }
+.pv-col.p2 { background:#2054d6; animation-delay:0.26s; }
+.pv-col.p1 { background:#2563eb; animation-delay:0.32s; }
 
 @keyframes pvDrop {
   from { opacity: 0; transform: translateY(-14px); }
