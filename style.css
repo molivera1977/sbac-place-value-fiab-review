@@ -65,7 +65,7 @@ h1 {
 .pv-hero {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: stretch;   /* every place card is the same height */
   gap: 5px;
   margin: 18px 0 22px;
   flex-wrap: nowrap;
@@ -74,6 +74,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 5px;
   border-radius: 12px;
   padding: 10px 7px 8px;
@@ -106,13 +107,18 @@ h1 {
   letter-spacing: 0.04em;
   opacity: 0.92;
   text-align: center;
+  /* reserve two lines so one-word places match two-word ones */
+  min-height: 2.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .pv-comma {
-  align-self: center;
+  align-self: flex-start;   /* sits on the digits, not the labels */
   font-size: 2rem;
   font-weight: bold;
   color: var(--primary);
-  margin: 0 1px 22px;
+  margin: 10px 1px 0;
 }
 
 .welcome-lead {
@@ -152,7 +158,7 @@ h1 {
   .pv-col  { min-width: 42px; padding: 8px 4px 6px; border-radius: 9px; }
   .pv-digit { font-size: 1.4rem; }
   .pv-place { font-size: 0.4rem; }
-  .pv-comma { font-size: 1.4rem; margin-bottom: 18px; }
+  .pv-comma { font-size: 1.4rem; margin: 8px 1px 0; }
   .welcome-lead { font-size: 1.05rem; }
   .pv-chip { font-size: 0.76rem; padding: 5px 11px; }
 }
