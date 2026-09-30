@@ -466,6 +466,7 @@ const app = {
     ['start-screen','readaloud-screen','directions-screen','quiz-screen','end-screen','scoreboard-screen']
       .forEach(s => document.getElementById(s).classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0, 0);   // every new screen starts at the top
     window.speechSynthesis.cancel();
   },
 
