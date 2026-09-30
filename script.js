@@ -49,6 +49,9 @@ function submitScorePartial() {
       tabSwitches:    tabSwitchCount,
       wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
       missedSkills:   skillTally(app.missedQuestions),
+      startedAt:      app.startedAt || '',
+      finishedAt:     app.finishedAt || '',
+      events:         JSON.stringify(app.events || []),
       timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
@@ -76,6 +79,9 @@ function submitScoreFinal() {
       tabSwitches:    tabSwitchCount,
       wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
       missedSkills:   skillTally(app.missedQuestions),
+      startedAt:      app.startedAt || '',
+      finishedAt:     app.finishedAt || '',
+      events:         JSON.stringify(app.events || []),
       timestamp:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     })
   }).catch(() => {});
@@ -268,6 +274,22 @@ function addHighlightFallback(u, spans) {
    count as correct. */
 function normalizeEntry(s) {
   return String(s == null ? '' : s).trim().toLowerCase().replace(/[,\s$]/g, '');
+}
+
+/* ── SESSION EVENT LOG ───────────────────────────────
+   Records what happened and when, so an attempt can be read
+   as a chronology: started, left, returned, resumed, finished.
+   elapsed is time ON TASK (the clock pauses while the page is
+   hidden), which is why it differs from wall-clock span. */
+function logEvent(kind, extra) {
+  if (!app.events) app.events = [];
+  app.events.push(Object.assign({
+    at: new Date().toISOString(),
+    e:  kind,
+    q:  (app.currentIndex || 0) + 1,
+    on: app.timerSeconds || 0
+  }, extra || {}));
+  if (app.events.length > 200) app.events.splice(0, app.events.length - 200);
 }
 
 /* Points available in a bank. A grid is worth one point PER ROW,
@@ -657,6 +679,9 @@ const app = {
     // Fixed up front so the progress row and the final row share one
     // sessionId — the Apps Script then overwrites the progress row
     // instead of leaving it behind as a second row.
+    this.events        = [];
+    this.startedAt     = new Date().toISOString();
+    this.finishedAt    = '';
     this.currentAttemptNum = reviewMode ? 1 :
       JSON.parse(localStorage.getItem(SCORES_KEY) || '[]')
         .filter(s => s.name === this.studentName && s.form === form && s.done).length + 1;
@@ -682,6 +707,7 @@ const app = {
     }
 
     this.show('quiz-screen');
+    logEvent('start', { form: form });
     this.startTimer();
     this.renderQuestion();
   },
@@ -720,6 +746,9 @@ const app = {
     this.missedQuestions = saved.missedQuestions || [];
     this.timerSeconds   = saved.timerSeconds || 0;
     this.currentAttemptNum = saved.currentAttemptNum || 1;
+    this.events         = saved.events || [];
+    this.startedAt      = saved.startedAt || new Date().toISOString();
+    logEvent('resume');
     this.show('quiz-screen');
     this.startTimer();
     this.renderQuestion();
@@ -735,7 +764,9 @@ const app = {
       streak:          this.streak,
       missedQuestions: this.missedQuestions,
       timerSeconds:    this.timerSeconds,
-      currentAttemptNum: this.currentAttemptNum
+      currentAttemptNum: this.currentAttemptNum,
+      events:          this.events,
+      startedAt:       this.startedAt
     }));
   },
 
@@ -1313,6 +1344,8 @@ const app = {
 
   /* ── FINISH SESSION ── */
   _finishSession() {
+    this.finishedAt = new Date().toISOString();
+    logEvent('finish');
     this.stopTimerEngine();
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(PVFIAB_SESSION_ID_KEY);
@@ -1679,6 +1712,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     if (!app.timerOn) return;
     tabSwitchCount++;
+    logEvent('leave');
     app.stopTimerEngine();
     app.saveProgress();
     if (app.instructInterval) { clearInterval(app.instructInterval); }
@@ -1687,6 +1721,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     if (!app._wasTimerRunning) return;
     app._wasTimerRunning = false;
+    logEvent('return');
     const warnBanner = document.getElementById('tab-warning-banner');
     if (warnBanner) warnBanner.classList.remove('hidden');
     app.stopTimerEngine();
@@ -1700,7 +1735,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 window.addEventListener('beforeunload', () => {
-  if (app.timerOn) app.saveProgress();
+  if (app.timerOn) { logEvent('close'); app.saveProgress(); }
 });
 
 /* ── CONFETTI ────────────────────────────────────────── */
