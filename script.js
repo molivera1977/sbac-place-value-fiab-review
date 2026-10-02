@@ -28,6 +28,15 @@ const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv8CWv1yyi8NeH04now9
 
 let tabSwitchCount = 0;
 
+/* One saved miss: "[ID] (Skill) question (picked: answer)". The dashboard reads the
+   pick to show which wrong choice each student chose; " | " separates entries, so
+   it is swapped out of the pick just in case. */
+function missEntry(m) {
+  const picked = m.yourAnswer == null || m.yourAnswer === '' ? '' :
+    ` (picked: ${String(m.yourAnswer).replace(/\s*\|\s*/g, ' / ').replace(/\s+/g, ' ').trim()})`;
+  return `[${m.id}] (${m.skill || 'Unsorted'}) ${m.q}${picked}`;
+}
+
 function submitScorePartial() {
   const pts = bankPoints(app.currentBank);
   const pct = pts ? Math.round((app.score / pts) * 100) : 0;
@@ -47,7 +56,7 @@ function submitScorePartial() {
       done:           false,
       elapsed:        app.timerSeconds,
       tabSwitches:    tabSwitchCount,
-      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
+      wrongQuestions: (app.missedQuestions||[]).map(missEntry).join(' | '),
       missedSkills:   skillTally(app.missedQuestions),
       startedAt:      app.startedAt || '',
       finishedAt:     app.finishedAt || '',
@@ -77,7 +86,7 @@ function submitScoreFinal() {
       done:           true,
       elapsed:        app.timerSeconds,
       tabSwitches:    tabSwitchCount,
-      wrongQuestions: (app.missedQuestions||[]).map(m=>`[${m.id}] (${m.skill||'Unsorted'}) ${m.q}`).join(' | '),
+      wrongQuestions: (app.missedQuestions||[]).map(missEntry).join(' | '),
       missedSkills:   skillTally(app.missedQuestions),
       startedAt:      app.startedAt || '',
       finishedAt:     app.finishedAt || '',
