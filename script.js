@@ -761,6 +761,8 @@ const app = {
     logEvent('resume');
     this.show('quiz-screen');
     this.startTimer();
+    // Saved right after answering the last question → nothing left to ask
+    if (this.currentIndex >= this.currentBank.length) { this._finishSession(); return; }
     this.renderQuestion();
   },
 
@@ -769,7 +771,7 @@ const app = {
       studentName:     this.studentName,
       currentForm:     this.currentForm,
       currentBank:     this.currentBank,
-      currentIndex:    this.currentIndex,
+      currentIndex:    this.questionLocked ? this.currentIndex + 1 : this.currentIndex, // answered → resume at the next one
       score:           this.score,
       streak:          this.streak,
       missedQuestions: this.missedQuestions,
