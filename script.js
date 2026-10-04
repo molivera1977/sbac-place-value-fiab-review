@@ -685,6 +685,7 @@ const app = {
     this.streak        = 0;
     this.missedQuestions = [];
     this.currentIndex  = 0;
+    this.questionLocked = false;   // a finished form leaves it set
     this.timerSeconds  = 0;
     // Fixed up front so the progress row and the final row share one
     // sessionId — the Apps Script then overwrites the progress row
@@ -1728,7 +1729,7 @@ document.addEventListener('visibilitychange', () => {
     app.stopTimerEngine();
     app.saveProgress();
     if (app.instructInterval) { clearInterval(app.instructInterval); }
-    if (app.readInterval)     { clearInterval(app.readInterval); }
+    if (app.readInterval)     { clearInterval(app.readInterval); app.readInterval = null; app._readLockPaused = true; }
     app._wasTimerRunning = true;
   } else {
     if (!app._wasTimerRunning) return;
@@ -1743,6 +1744,9 @@ document.addEventListener('visibilitychange', () => {
       if (app.timerSeconds % 30 === 0) app.saveProgress();
     }, 1000);
     app.timerOn = true;
+    // The read lock stopped while the page was hidden; start it over so the
+    // answers unlock again (left alone they stayed locked until a refresh).
+    if (app._readLockPaused) { app._readLockPaused = false; app.startReadTimer(); }
   }
 });
 
