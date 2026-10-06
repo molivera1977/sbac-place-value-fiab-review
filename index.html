@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SBAC Practice: Place Value &amp; Multidigit Whole Numbers</title>
-  <link rel="stylesheet" href="style.css?v=pv10" />
+  <link rel="stylesheet" href="style.css?v=pv10-ra1" />
 </head>
 <body>
 <canvas id="confetti-canvas"></canvas>
@@ -125,8 +125,8 @@
   <div id="readaloud-screen" class="hidden">
     <div style="text-align:center;margin-bottom:20px;">
       <div style="font-size:3.5rem;margin-bottom:10px;">🔊</div>
-      <h2 style="color:var(--primary);margin:0 0 8px;">Read Aloud is Available!</h2>
-      <p style="color:#555;font-size:0.95rem;line-height:1.6;max-width:420px;margin:0 auto;">
+      <h2 class="ra-read" style="color:var(--primary);margin:0 0 8px;">Read Aloud is Available!</h2>
+      <p class="ra-read" style="color:#555;font-size:0.95rem;line-height:1.6;max-width:420px;margin:0 auto;">
         Every question and every answer choice has its own speaker button.<br>
         You can use it as much as you need!
       </p>
@@ -135,15 +135,15 @@
     <div style="display:flex;flex-direction:column;gap:14px;max-width:420px;margin:0 auto 24px;">
       <div style="background:#eaf4ff;border:2px solid #b3d4f5;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:16px;">
         <span style="font-size:2rem;">1️⃣</span>
-        <div><strong>Tap 🔊 once</strong> — the question or choice is read aloud</div>
+        <div class="ra-read"><strong>Tap 🔊 once</strong> — the question or choice is read aloud</div>
       </div>
       <div style="background:#fff3e0;border:2px solid #ffd08a;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:16px;">
         <span style="font-size:2rem;">2️⃣</span>
-        <div><strong>Tap ⏹ to stop</strong> — reading stops immediately</div>
+        <div class="ra-read"><strong>Tap ⏹ to stop</strong> — reading stops immediately</div>
       </div>
       <div style="background:#e8f5e9;border:2px solid #a5d6a7;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:16px;">
         <span style="font-size:2rem;">3️⃣</span>
-        <div><strong>Tap 🔊 again</strong> — it replays from the beginning</div>
+        <div class="ra-read"><strong>Tap 🔊 again</strong> — it replays from the beginning</div>
       </div>
     </div>
 
@@ -218,7 +218,7 @@
 
     <div class="dir-section timer-dir">
       <div class="dir-row">
-        <button class="speak-btn" onclick="speakDir(this)" style="border-color:#2ecc71;color:#2ecc71;">🔊</button>
+        <button class="speak-btn" onclick="speakDir(this)">🔊</button>
         <h3 style="margin:0;">⏱ Overall Timer</h3>
       </div>
       <p class="dir-text">A timer runs the whole time. It is not a countdown — there is no time limit. It only tracks how long you take so your teacher can see your progress.</p>
@@ -372,10 +372,10 @@
 
 </div><!-- /.container -->
 
-<script src="data/skills.js?v=pv10"></script>
-<script src="data/form_a.js?v=pv10"></script>
-<script src="data/form_b.js?v=pv10"></script>
-<script src="data/form_c.js?v=pv10"></script>
-<script src="script.js?v=pv12"></script>
+<script src="data/skills.js?v=pv10-ra1"></script>
+<script src="data/form_a.js?v=pv10-ra1"></script>
+<script src="data/form_b.js?v=pv10-ra1"></script>
+<script src="data/form_c.js?v=pv10-ra1"></script>
+<script src="script.js?v=pv12-ra1"></script>
 </body>
 </html>
