@@ -211,6 +211,8 @@ function convertToSpokenText(raw) {
       return `${numToWord(n)} ${dFinal}`;
     })
     .replace(/×/g, ' times ')
+    .replace(/(^|\s)\+(?=\s|$)/g, '$1plus')
+    .replace(/(^|\s)=(?=\s|$)/g, '$1equals')
     .replace(/\bx\b/g, ' times ');
 }
 
@@ -1413,7 +1415,7 @@ const app = {
     fbSpeakBtn.textContent = '🔊';
     // Wrap feedback words in spans for word-by-word highlighting (skip emoji-only tokens)
     fb.innerHTML = wrapWords(fb.innerHTML);
-    const fbSpans = Array.from(fb.querySelectorAll('.wrd')).filter(s => /[A-Za-z0-9]/.test(s.textContent));
+    const fbSpans = Array.from(fb.querySelectorAll('.wrd')).filter(s => /[A-Za-z0-9+=×]/.test(s.textContent))   /* keep + = × so they are read aloud */;
     const spokenFb = convertToSpokenText(fbSpans.map(s => {
       const gap = s.nextSibling && s.nextSibling.nodeType === 3 && /\u00a0{2,}/.test(s.nextSibling.textContent);
       return s.textContent + (gap ? ',' : '');
