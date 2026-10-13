@@ -11,6 +11,7 @@
 
 /* ── CONFIG ─────────────────────────────────────────── */
 const REVIEW_OPEN   = true;   // false = students locked out; only Teacher Access works. Set true to open.
+const SHARE_MODE    = !!window.SHARE_MODE;   // set by share.js — a visitor's link, never a student's
 const INSTRUCT_SECS = 20;
 const READ_SECS     = 12;
 const NEXT_SECS     = 8;
@@ -592,7 +593,7 @@ const app = {
 
   /* ── READ ALOUD INTRO ── */
   showReadAloudIntro() {
-    if (!REVIEW_OPEN) return;
+    if (!REVIEW_OPEN && !SHARE_MODE) return;
     document.getElementById('welcome-panel').classList.add('hidden');
     this.show('readaloud-screen');
     setTimeout(speakReadAloudIntro, 150);   // announces itself (show() just cancelled any speech)
@@ -638,6 +639,18 @@ const app = {
     this.show('start-screen');
     document.getElementById('welcome-panel').classList.add('hidden');
     document.getElementById('student-login-panel').classList.remove('hidden');
+    if (SHARE_MODE) this._shareSignIn();
+  },
+
+  /* Shared preview: no roster, no student number — straight to the forms. */
+  _shareSignIn() {
+    loggedInName     = 'Visitor';
+    this.studentName = 'Visitor';
+    const loginCard = document.getElementById('login-step-card');
+    if (loginCard) loginCard.classList.add('hidden');
+    document.getElementById('form-select-section').classList.remove('hidden');
+    applyFormLocks(this.studentName);
+    this.checkResume();
   },
 
   /* ── NAME SELECT ── */
@@ -1475,7 +1488,7 @@ const app = {
     const scores   = JSON.parse(localStorage.getItem(SCORES_KEY) || '[]');
     const attemptNum = this.currentAttemptNum || 1;
 
-    if (!reviewMode) {
+    if (!reviewMode && !SHARE_MODE) {   // a visitor's score is never saved, so no attempt lock ever starts
       scores.push({
         name:    this.studentName,
         form:    this.currentForm,
@@ -1505,8 +1518,9 @@ const app = {
     const reviewNextBtn = document.getElementById('review-next-btn');
     if (reviewNextBtn) reviewNextBtn.classList.toggle('hidden', !reviewMode);
 
-    document.getElementById('final-score-sub').textContent =
-      `Form ${this.currentForm} · Attempt ${attemptNum} · ${this.studentName}`;
+    document.getElementById('final-score-sub').textContent = SHARE_MODE
+      ? `Form ${this.currentForm} · Shared preview — this score was not saved`
+      : `Form ${this.currentForm} · Attempt ${attemptNum} · ${this.studentName}`;
     document.getElementById('final-msg').textContent = msg;
 
     const pctEl = document.getElementById('final-percent');
@@ -1551,7 +1565,7 @@ const app = {
 
     if (pct >= 70) startConfetti(pct);
 
-    if (!reviewMode && allFormsCompletedOnce(this.studentName)) {
+    if (!reviewMode && !SHARE_MODE && allFormsCompletedOnce(this.studentName)) {
       setTimeout(() => this.showScores(true), 3000);
     }
   },
@@ -1919,7 +1933,7 @@ app.init();
 
 /* ── CLOSED-TO-STUDENTS LOCK ────────────────────────── */
 (function applyReviewLock() {
-  if (REVIEW_OPEN) return;
+  if (REVIEW_OPEN || SHARE_MODE) return;
   const btn = document.querySelector('.lgs-btn');
   if (!btn) return;
   btn.disabled = true;
