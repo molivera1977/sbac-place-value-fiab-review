@@ -644,8 +644,8 @@ const app = {
 
   /* Shared preview: no roster, no student number — straight to the forms. */
   _shareSignIn() {
-    loggedInName     = 'Visitor';
-    this.studentName = 'Visitor';
+    loggedInName     = 'Guest';
+    this.studentName = 'Guest';
     const loginCard = document.getElementById('login-step-card');
     if (loginCard) loginCard.classList.add('hidden');
     document.getElementById('form-select-section').classList.remove('hidden');
@@ -1519,7 +1519,7 @@ const app = {
     if (reviewNextBtn) reviewNextBtn.classList.toggle('hidden', !reviewMode);
 
     document.getElementById('final-score-sub').textContent = SHARE_MODE
-      ? `Form ${this.currentForm} · Shared preview — this score was not saved`
+      ? `Form ${this.currentForm} · Guest view — this score was not saved`
       : `Form ${this.currentForm} · Attempt ${attemptNum} · ${this.studentName}`;
     document.getElementById('final-msg').textContent = msg;
 
