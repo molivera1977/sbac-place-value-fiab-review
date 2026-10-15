@@ -915,3 +915,9 @@ button.answer-btn.sym-btn.incorrect .sym-word { color: inherit; }
 .lgs-btn.locked,
 .lgs-btn.locked:hover { background: #b8b8b8; box-shadow: 0 5px 0 #8f8f8f; cursor: not-allowed; transform: none; filter: grayscale(1); }
 .locked-note { color: #888; font-size: 0.95rem; margin: 14px 0 0; }
+
+/* Finish screen (Marcos 10/14): Sign Out is quieter than the main buttons, and each button says where it goes */
+.signout-btn { background:none; border:2px solid #ccc; border-radius:10px; color:#666; font-family:inherit;
+               font-size:0.95rem; font-weight:700; padding:8px 16px; cursor:pointer; }
+.signout-btn:hover { border-color:#999; color:#333; }
+.signout-sub { display:block; font-size:0.8rem; font-weight:600; color:#888; margin-top:2px; }
