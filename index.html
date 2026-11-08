@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SBAC Practice: Place Value &amp; Multidigit Whole Numbers</title>
-  <link rel="stylesheet" href="style.css?v=pv10-ra4-nav1" />
+  <link rel="stylesheet" href="style.css?v=pv10-ra4-nav1-teach1" />
 </head>
 <body>
 <canvas id="confetti-canvas"></canvas>
@@ -47,6 +47,15 @@
       <div style="text-align:right;margin-top:10px;">
         <span onclick="app.promptTeacherReview()" style="font-size:0.75rem;color:#767676;cursor:pointer;user-select:none;">Teacher Access</span>
       </div>
+    </div>
+
+    <!-- 👀 TRY IT AS A STUDENT (Teacher screen): a ?share=…&teach=<form> link starts here — one tap starts the form
+         (the tap also lets the device speak) -->
+    <div id="teach-ready" class="teach-ready hidden">
+      <p class="teach-ready-h">🧑‍🏫 Try it as a student</p>
+      <p class="teach-ready-what" id="teach-what"></p>
+      <p class="teach-ready-note">You answer, the way a student does. ⏩ Skip the wait opens anything that is shut. Nothing is saved.</p>
+      <button type="button" class="start-btn" id="teach-start-btn" onclick="app.teachStart()">▶ Start</button>
     </div>
 
     <!-- STUDENT LOGIN (hidden until after directions) -->
@@ -313,10 +322,6 @@
     <div class="signout-row" style="text-align:center;margin-top:14px;">
       <button class="signout-btn" onclick="app.restart()">🚪 Sign Out<span class="signout-sub">Only when you are all done. You will go back to the start.</span></button>
     </div>
-    <div id="review-next-btn" class="hidden" style="text-align:center;margin-top:12px;">
-      <button class="start-btn" style="background:#8e44ad;box-shadow:0 5px 0 #6c3483;" onclick="app._showReviewPicker()">🔍 Review Another Form</button>
-      <button onclick="app.exitReviewMode()" style="display:block;margin:10px auto 0;background:none;border:none;color:#999;font-size:0.8rem;cursor:pointer;font-family:inherit;text-decoration:underline;">Exit Review Mode</button>
-    </div>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -354,6 +359,36 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       TEACHER SCREEN (Marcos 11/8: "update the sbac reviews" — the Teacher screen of 10/28): Teacher Access asks the
+       PIN in the page, then one screen — a form, then 👀 Try it as a student or ✅ Answer key. Any form; nothing has
+       to be done first. No Slide Mode: a review has no lesson to teach from. Filled in by script.js.
+  ══════════════════════════════════════════ -->
+  <div id="teacher-screen" class="hidden">
+    <div class="t-bar">
+      <span class="t-title">🧑‍🏫 Teacher</span>
+      <span class="t-note">Nothing here is saved or sent.</span>
+      <button type="button" class="t-exit" id="t-exit-btn" onclick="app.exitTeacher()">✕ Exit teacher</button>
+    </div>
+    <h3 class="t-h">Form</h3>
+    <div class="t-row" id="t-forms"></div>
+    <p class="t-picked" id="t-picked"></p>
+    <div class="t-actions">
+      <button type="button" class="t-act" id="t-try" onclick="app.teacherTry()">👀 Try it as a student<span>You answer, like a student, from the first question to the score. ⏩ Skip the wait opens anything that is shut. Nothing is saved.</span></button>
+      <button type="button" class="t-act" id="t-key" onclick="app.teacherKey()">✅ Answer key<span>Every question of this form on one page, the right answer marked, and why. You can print it.</span></button>
+    </div>
+  </div>
+
+  <!-- ✅ ANSWER KEY (Teacher screen): filled in by script.js (teacherKey) -->
+  <div id="key-screen" class="hidden">
+    <div class="t-bar">
+      <span class="t-title" id="key-title">✅ Answer key</span>
+      <button type="button" class="t-exit" id="key-print-btn" onclick="app.printKey()">🖨️ Print</button>
+      <button type="button" class="t-exit" id="key-back-btn" onclick="app.openTeacher()">← Teacher screen</button>
+    </div>
+    <div id="key-body"></div>
+  </div>
+
   <!-- GLOBAL PIN MODAL -->
   <div id="pin-modal" class="hidden">
     <div class="pin-modal-inner">
@@ -374,13 +409,25 @@
 
 </div><!-- /.container -->
 
-<script src="share.js?v=3"></script>
+<!-- 👀 Try it as a student: the teacher's bar (shown only on a ?teach= link) -->
+<div id="teach-bar" class="teach-bar hidden">
+  <span class="teach-bar-what">🧑‍🏫 Trying it as a student · nothing is saved</span>
+  <span class="teach-go">
+    <button type="button" id="teach-prev" aria-label="Back one" onclick="app.teachStep(-1)">◀</button>
+    <select id="teach-jump" aria-label="Go to a question" onchange="app.teachGo(Number(this.value)); this.blur();"></select>
+    <button type="button" id="teach-next" aria-label="Forward one" onclick="app.teachStep(1)">▶</button>
+  </span>
+  <button type="button" id="teach-skip" onclick="app.teacherSkipWait()">⏩ Skip the wait</button>
+  <button type="button" id="teach-back" onclick="app.backToTeacher()">← Teacher screen</button>
+</div>
+
+<script src="share.js?v=4"></script>
 <script src="form-label.js?v=1"></script>
 <script src="next-waits.js?v=1" data-hold='#next-btn, #lc-next'></script>
 <script src="data/skills.js?v=pv10-ra4"></script>
 <script src="data/form_a.js?v=pv10-ra4"></script>
 <script src="data/form_b.js?v=pv10-ra4"></script>
 <script src="data/form_c.js?v=pv10-ra4"></script>
-<script src="script.js?v=pv12-ra4-sp1-sh2-hl2-nav1-fl1-hush1-r82-keys1-follow1-dir15-voice1"></script>
+<script src="script.js?v=pv12-ra4-sp1-sh2-hl2-nav1-fl1-hush1-r82-keys1-follow1-dir15-voice1-teach1"></script>
 </body>
 </html>

@@ -12,6 +12,16 @@
 /* ── CONFIG ─────────────────────────────────────────── */
 const REVIEW_OPEN   = true;   // false = students locked out; only Teacher Access works. Set true to open.
 const SHARE_MODE    = !!window.SHARE_MODE;   // set by share.js — a visitor's link, never a student's
+/* The Teacher screen (see promptTeacherReview): the PIN holds in this tab; a Try-it link is ?share=…&teach=<form> */
+const TEACHER_KEY      = 'pvfiab_teacher';        // sessionStorage: '1' = the Teacher PIN was given in this tab
+const TEACHER_PICK_KEY = 'pvfiab_teacher_pick';   // sessionStorage: the last form picked
+const TEACH_FORMS      = ['A', 'B', 'C'];
+const TEACH = (() => {
+  const f = new URLSearchParams(location.search).get('teach') || '';
+  return SHARE_MODE && TEACH_FORMS.includes(f) ? f : null;
+})();
+function teacherUnlocked() { try { return sessionStorage.getItem(TEACHER_KEY) === '1'; } catch (e) { return false; } }
+function formLabel(form) { return 'Form ' + (form || '?'); }   // a form's name (the Teacher screen and its answer key)
 const INSTRUCT_SECS = 15;
 const READ_SECS     = 12;
 const NEXT_SECS     = 8;
@@ -364,6 +374,13 @@ function skillFor(q, rowIdx) {
   return s || 'Unsorted';
 }
 
+/* The < > = pad's three signs (the pad, and the Teacher screen's answer key) */
+const SYMBOL_CHOICES = [
+  { s: '<', word: 'is less than' },
+  { s: '>', word: 'is greater than' },
+  { s: '=', word: 'is equal to' }
+];
+
 /* Every control a student can answer with — used by the
    read lock and by confirm to freeze the item. */
 function answerControls() {
@@ -665,7 +682,7 @@ const app = {
 
   /* ── screens ── */
   show(id) {
-    ['start-screen','readaloud-screen','directions-screen','quiz-screen','end-screen','scoreboard-screen']
+    ['start-screen','readaloud-screen','directions-screen','quiz-screen','end-screen','scoreboard-screen','teacher-screen','key-screen']
       .forEach(s => document.getElementById(s).classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
     syncFormLabel(id);
@@ -829,25 +846,154 @@ const app = {
     }
   },
 
-  /* ── TEACHER REVIEW MODE ── */
+  /* ── TEACHER SCREEN (Marcos 11/8: "update the sbac reviews" — the Teacher screen of 10/28) ──
+     Teacher Access → the Teacher PIN in the page → pick a form → 👀 Try it as a student or ✅ Answer key.
+     The PIN holds in this tab until ✕ Exit teacher. Nothing on the Teacher screen is saved or sent, and a
+     student's saved place on this computer is never touched (the old Teacher Access erased it). No Slide Mode:
+     a review has no lesson to put on the board, only scored questions (Marcos 10/30: Slide Mode is the teaching only). */
   promptTeacherReview() {
-    const pin = prompt('Enter Teacher PIN to access Review Mode:');
-    if (pin !== '9377') { if (pin !== null) alert('Incorrect PIN.'); return; }
-    this.studentName = 'Mr. O (Teacher)';
-    reviewMode = true;
-    localStorage.removeItem(STORAGE_KEY);
-    this._showReviewPicker();
+    if (teacherUnlocked()) { this.openTeacher(); return; }
+    this.showPinModal('🧑‍🏫 Teacher', 'Enter the Teacher PIN.', () => {
+      try { sessionStorage.setItem(TEACHER_KEY, '1'); } catch (e) {}
+      this.openTeacher();
+    });
   },
 
-  _showReviewPicker() {
-    const form = prompt('Choose a form to review:\n1 — Form A\n2 — Form B\n3 — Form C\n\nEnter 1, 2, or 3:');
-    const map = { '1': 'A', '2': 'B', '3': 'C' };
-    if (!map[form]) { alert('Invalid choice.'); reviewMode = false; return; }
-    const mode = prompt('Choose review mode:\n1 — Manual (tap Next each question)\n2 — Auto-run (fully automatic)\n\nEnter 1 or 2:');
-    if (mode !== '1' && mode !== '2') { alert('Invalid choice.'); reviewMode = false; return; }
-    reviewAutoRun = (mode === '2');
-    this.startSession(map[form]);
+  _teacherPick() {
+    let p = null;
+    try { p = sessionStorage.getItem(TEACHER_PICK_KEY); } catch (e) {}
+    return TEACH_FORMS.includes(p) ? p : TEACH_FORMS[0];
   },
+
+  openTeacher() {
+    stopActiveSpeech();
+    this._renderTeacher(this._teacherPick());
+    this.show('teacher-screen');
+  },
+
+  teacherPick(form) { this._renderTeacher(form); },
+
+  _renderTeacher(form) {
+    try { sessionStorage.setItem(TEACHER_PICK_KEY, form); } catch (e) {}
+    document.getElementById('t-forms').innerHTML = TEACH_FORMS.map(f =>
+      `<button type="button" class="t-pick${f === form ? ' on' : ''}" aria-pressed="${f === form}" data-id="${f}" onclick="app.teacherPick('${f}')">${formLabel(f)}</button>`).join('');
+    document.getElementById('t-picked').textContent = `${formLabel(form)} · ${window['FORM_' + form].length} questions`;
+  },
+
+  /* 👀 Try it as a student: the guest view (share.js — nothing reaches the sheet, its own storage), started on this form */
+  teacherTry() {
+    location.href = `${location.pathname}${window.SHARE_LINK}&teach=${this._teacherPick()}`;
+  },
+
+  /* ✅ Answer key: every question of the form in the form's own order (a student gets them mixed), the right answer
+     marked ✅ — a choice, each row of a True/False grid, the < > = sign — and why */
+  teacherKey() {
+    const form = this._teacherPick();
+    const items = window['FORM_' + form];
+    document.getElementById('key-title').textContent = `✅ Answer key · ${formLabel(form)}`;
+    document.getElementById('key-body').innerHTML =
+      `<div class="key-print-head"><h1>SBAC Practice: Place Value Answer Key — ${formLabel(form)}</h1>` +
+      `<p>${items.length} questions · the right answer is marked ✅</p></div>` +
+      items.map((q, k) => `<div class="key-q"><p class="key-where">${q.id} · Question ${k + 1} of ${items.length}</p>` +
+        `<p class="key-ask">${formatMathText(q.q)}</p>${this._keyAnswerHTML(q)}` +
+        (q.explanation ? `<div class="key-why"><strong>Why:</strong> ${formatMathText(q.explanation)}</div>` : '') + '</div>').join('');
+    this.show('key-screen');
+  },
+
+  _keyAnswerHTML(q) {
+    const mark = right => right ? ' ✅' : '';
+    if (q.type === 'grid') {
+      return `<table class="key-grid"><tr><th></th>${q.cols.map(c => `<th>${c}</th>`).join('')}</tr>` +
+        q.rows.map(r => `<tr><td>${formatMathText(r.text)}</td>${q.cols.map(c =>
+          `<td class="${c === r.answer ? 'key-right' : ''}">${c === r.answer ? '✅ ' + c : ''}</td>`).join('')}</tr>`).join('') + '</table>';
+    }
+    const choices = q.type === 'symbol' ? SYMBOL_CHOICES.map(s => s.s)
+      : q.type === 'entry' ? [q.answer] : q.choices;
+    const shown = c => q.type === 'symbol' ? `${c.replace('<', '&lt;').replace('>', '&gt;')} ${SYMBOL_CHOICES.find(s => s.s === c).word}` : formatMathText(c);
+    return `<ul class="key-choices">${choices.map(c =>
+      `<li class="${c === q.answer ? 'key-right' : ''}">${shown(c)}${mark(c === q.answer)}</li>`).join('')}</ul>`;
+  },
+
+  printKey() {
+    document.body.classList.add('key-printing');
+    window.print();
+    document.body.classList.remove('key-printing');
+  },
+
+  backToTeacher() {
+    if (TEACH) { location.href = `${location.pathname}#teacher`; return; }
+    this.openTeacher();
+  },
+
+  exitTeacher() {
+    try { sessionStorage.removeItem(TEACHER_KEY); } catch (e) {}
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    this.exitReviewMode();
+  },
+
+  /* A Try-it link: signed in as the guest (the guest's form menu behind it), one tap to start (the tap also lets
+     the device speak) */
+  _teachReady() {
+    if (!TEACH) return;
+    this._shareSignIn();
+    document.getElementById('teach-bar').classList.remove('hidden');
+    document.body.classList.add('teach-on');
+    document.getElementById('welcome-panel').classList.add('hidden');
+    document.getElementById('student-login-panel').classList.add('hidden');
+    document.getElementById('teach-what').textContent = `${formLabel(TEACH)} · SBAC Practice: Place Value`;
+    document.getElementById('teach-ready').classList.remove('hidden');
+  },
+
+  teachStart() {
+    document.getElementById('teach-ready').classList.add('hidden');
+    this.startSession(TEACH);
+  },
+
+  /* ⏩ Skip the wait: opens what a student is waiting on right now — the 12 s read lock on the answers, the 8 s
+     pause before Next, the score screen's lock. Stopping the voice also lets next-waits.js go. */
+  teacherSkipWait() {
+    stopActiveSpeech();
+    if (this.readInterval) {
+      clearInterval(this.readInterval);
+      this.readInterval = null;
+      document.getElementById('reading-timer-bar').classList.add('hidden');
+      answerControls().forEach(b => lockControl(b, false));
+      if (!this.questionLocked) document.getElementById('confirm-btn').classList.remove('hidden');
+    }
+    if (this.nextInterval) {
+      clearInterval(this.nextInterval);
+      this.nextInterval = null;
+      document.getElementById('next-timer-bar').classList.add('hidden');
+      document.getElementById('next-btn').classList.remove('hidden');
+    }
+    if (this._scoreUnlock) this._scoreUnlock();
+  },
+
+  /* Go anywhere in the run (Marcos 10/28: "teacher mode should be able to go anywhere" · arrows beside the menu):
+     the questions in the order this run asks them, each with its id from the answer key. A question skipped is not
+     scored; the end screen counts only what was answered. */
+  _teachSync() {
+    const bank = this.currentBank || [];
+    const jump = document.getElementById('teach-jump');
+    document.getElementById('teach-bar').classList.add('started');
+    if (jump.options.length !== bank.length) jump.innerHTML = bank.map((q, k) =>
+      `<option value="${k}">❓ Question ${k + 1} of ${bank.length} · ${q.id}</option>`).join('');
+    jump.value = String(this.currentIndex);
+    document.getElementById('teach-prev').disabled = this.currentIndex <= 0;
+    document.getElementById('teach-next').disabled = this.currentIndex >= bank.length - 1;
+  },
+
+  teachGo(k) {
+    if (!this.currentBank || !this.currentBank[k]) return;
+    stopActiveSpeech();
+    if (this.readInterval) { clearInterval(this.readInterval); this.readInterval = null; }
+    if (this.nextInterval) { clearInterval(this.nextInterval); this.nextInterval = null; }
+    if (document.getElementById('quiz-screen').classList.contains('hidden')) this.show('quiz-screen');
+    this.currentIndex = k;
+    this.renderQuestion();
+  },
+
+  teachStep(d) { this.teachGo(Math.min(this.currentIndex, (this.currentBank || []).length) + d); },
 
   exitReviewMode() {
     reviewMode    = false;
@@ -1157,6 +1303,7 @@ const app = {
     document.getElementById('progress-text').textContent = `Question ${this.currentIndex + 1} of ${total}`;
     document.getElementById('score-text').textContent    = `${getFirstName(this.studentName)} · ${this.score}`;
     document.getElementById('progress-fill').style.width = `${(this.currentIndex / total) * 100}%`;
+    if (TEACH) this._teachSync();   // the teacher's ◀ menu ▶ on a Try-it run
 
     this._renderStreak();
 
@@ -1365,12 +1512,7 @@ const app = {
     wrap.className = 'options-grid symbol-item';
     const pad = document.createElement('div');
     pad.className = 'sym-pad';
-    const SYMS = [
-      { s: '<', word: 'is less than' },
-      { s: '>', word: 'is greater than' },
-      { s: '=', word: 'is equal to' }
-    ];
-    SYMS.forEach(({ s, word }) => {
+    SYMBOL_CHOICES.forEach(({ s, word }) => {
       const btn = document.createElement('button');
       btn.className = 'answer-btn sym-btn';
       btn.dataset.answer = s;
@@ -1598,9 +1740,6 @@ const app = {
 
     this.show('end-screen');
 
-    const reviewNextBtn = document.getElementById('review-next-btn');
-    if (reviewNextBtn) reviewNextBtn.classList.toggle('hidden', !reviewMode);
-
     document.getElementById('final-score-sub').textContent = SHARE_MODE
       ? `Form ${this.currentForm} · Guest view — this score was not saved`
       : `Form ${this.currentForm} · Attempt ${attemptNum} · ${this.studentName}`;
@@ -1789,12 +1928,15 @@ const app = {
       remaining--;
       count.textContent = remaining;
       fill.style.width = (remaining / secs * 100) + '%';
-      if (remaining <= 0) {
-        clearInterval(iv);
-        bar.classList.add('hidden');
-        buttons.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
-      }
+      if (remaining <= 0) unlock();
     }, 1000);
+    const unlock = () => {   // the lock's end — and ⏩ Skip the wait on a Try-it run
+      clearInterval(iv);
+      if (this._scoreUnlock === unlock) this._scoreUnlock = null;
+      bar.classList.add('hidden');
+      buttons.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+    };
+    this._scoreUnlock = unlock;
   },
 
   clearScores() {
@@ -2028,6 +2170,8 @@ function stopConfetti() {
 
 /* ── BOOT ────────────────────────────────────────────── */
 app.init();
+if (TEACH) app._teachReady();                                              // a Try-it link from the Teacher screen
+else if (location.hash === '#teacher' && teacherUnlocked()) app.openTeacher();   // ← Teacher screen from a Try-it run
 
 /* ── CLOSED-TO-STUDENTS LOCK ────────────────────────── */
 (function applyReviewLock() {
