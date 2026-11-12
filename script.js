@@ -2209,5 +2209,8 @@ if (window.SpotSync) SpotSync.init({
   site: 'sbac-place-value-fiab-review', key: STORAGE_KEY, url: SHEET_URL, app,
   who: () => loggedInName,
   skip: () => SHARE_MODE || reviewMode,
-  usable: s => Array.isArray(s.currentBank) && s.currentBank.length > 0
+  usable: s => Array.isArray(s.currentBank) && s.currentBank.length > 0,
+  // finished parts follow the student too (Marcos 11/12: "Make finished parts and unlocks follow kids across computers next?" → "Yes, build it")
+  records: [{ key: SCORES_KEY }],
+  refresh: name => applyFormLocks(name)
 });
