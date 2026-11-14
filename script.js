@@ -922,7 +922,7 @@ const app = {
   },
 
   backToTeacher() {
-    if (TEACH) { location.href = `${location.pathname}#teacher`; return; }
+    if (TEACH) { location.href = `${location.pathname}${window.SHARE_TEACHER ? window.SHARE_LINK : ''}#teacher`; return; }   // a teacher/admin guest keeps the guest link
     this.openTeacher();
   },
 
@@ -2214,3 +2214,6 @@ if (window.SpotSync) SpotSync.init({
   records: [{ key: SCORES_KEY }],
   refresh: name => applyFormLocks(name)
 });
+
+/* the teacher/admin guest link (share.js, Marcos 11/13): its 🧑‍🏫 Teacher / admin guest button opens the Teacher screen, no PIN */
+if (window.SHARE_TEACHER) window.SHARE_OPEN_TEACHER = () => app.openTeacher();
