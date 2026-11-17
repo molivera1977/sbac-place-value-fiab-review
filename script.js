@@ -226,6 +226,14 @@ function convertToSpokenText(raw) {
     .replace(/×/g, ' times ')
     .replace(/(^|\s)\+(?=\s|$)/g, '$1plus')
     .replace(/(^|\s)=(?=\s|$)/g, '$1equals')
+    // < and > said as words (11/16, for Ava: between number words she said nothing for them — "four hundred
+    // ninety-nine < five hundred" came out "499, 500" — and the feedback's word list dropped them, so a row was read
+    // "540 40 plus 500 False")
+    // a sign that IS the answer: "The correct answer is: less than" · "the answer is less than."
+    .replace(/(:\s*|\bis\s+)<(?=[\s.,;!?]|$)/g, '$1less than')
+    .replace(/(:\s*|\bis\s+)>(?=[\s.,;!?]|$)/g, '$1greater than')
+    .replace(/(^|\s)<(?=[\s.,;!?]|$)/g, '$1is less than')
+    .replace(/(^|\s)>(?=[\s.,;!?]|$)/g, '$1is greater than')
     .replace(/\bx\b/g, ' times ');
 }
 
@@ -1656,7 +1664,7 @@ const app = {
     fbSpeakBtn.textContent = '🔊';
     // Wrap feedback words in spans for word-by-word highlighting (skip emoji-only tokens)
     fb.innerHTML = wrapWords(fb.innerHTML);
-    const fbSpans = Array.from(fb.querySelectorAll('.wrd')).filter(s => /[A-Za-z0-9+=×]/.test(s.textContent))   /* keep + = × so they are read aloud */;
+    const fbSpans = Array.from(fb.querySelectorAll('.wrd')).filter(s => /[A-Za-z0-9+=×<>]/.test(s.textContent))   /* keep + = × < > so they are read aloud */;
     const spokenFb = sayWords(fbSpans, fbSpans.map(s => {
       const gap = s.nextSibling && s.nextSibling.nodeType === 3 && /\u00a0{2,}/.test(s.nextSibling.textContent);
       return s.textContent + (gap ? ',' : '');

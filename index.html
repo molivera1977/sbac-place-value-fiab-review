@@ -423,12 +423,19 @@
 
 <script src="share.js?v=9"></script>
 <script src="form-label.js?v=1"></script>
+<!-- Ava reads the site (Marcos 11/16: "work on adding Ava to SBAC"): every line the site can say is recorded ahead in kokoro/
+     (Edge en-US-AvaNeural, -12%, the voice of Base Ten and Module 4), and kokoro-voice.js plays them in place of the
+     device voice. The list = site-tests sbac-*-kokoro.spec.js (KOKORO_LIST), recorded by kokoro-voice/make_ava_kokoro.py
+     with AVA_CAPS_AS_WORDS=1. A line with no recording is said by the device voice; ?voice=device turns Ava off.
+     Before next-waits.js, which listens to it. -->
+<script src="kokoro/lines.js?v=d55316eb"></script>
+<script src="kokoro-voice.js?v=ks1116"></script>
 <script src="next-waits.js?v=1" data-hold='#next-btn, #lc-next'></script>
 <script src="data/skills.js?v=pv10-ra4"></script>
 <script src="data/form_a.js?v=pv10-ra4"></script>
 <script src="data/form_b.js?v=pv10-ra4"></script>
 <script src="data/form_c.js?v=pv10-ra4"></script>
 <script src="spot-sync.js?v=3"></script>
-<script src="script.js?v=pv12-ra4-sp1-sh2-hl2-nav1-fl1-hush1-r82-keys1-follow1-dir15-voice1-teach1-roster24-rec1-guest1"></script>
+<script src="script.js?v=pv12-ra4-sp1-sh2-hl2-nav1-fl1-hush1-r82-keys1-follow1-dir15-voice1-teach1-roster24-rec1-guest1-cmp1"></script>
 </body>
 </html>
