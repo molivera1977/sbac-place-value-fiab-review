@@ -45,7 +45,8 @@
 ═══════════════════════════════════════════════════════ */
 (function () {
   var SHARE_CODE = 'mro';       // the student guest code — change it here to shut old links off
-  var TEACHER_HASH = 'ae786515';   // fingerprint (fnv) of the teacher/admin code — a new code = a new fingerprint
+  var TEACHER_HASH = 'ce64cc1c';   // fingerprint (fnv) of the SBAC teacher/admin code (11/19) — a new code = a new fingerprint
+  var TEACHER_HASH_ALSO = 'ae786515';   // the teacher code of Mr. O's other sites: his Class Portal's teacher link hands it on here
 
   /* FNV-1a, 32 bits: a fingerprint of a code, not a lock — enough to keep the code out of sight */
   var fnv = function (s) {
@@ -54,7 +55,7 @@
     return ('0000000' + h.toString(16)).slice(-8);
   };
   var given = new URLSearchParams(location.search).get('share') || '';
-  var teacher = given !== '' && given !== SHARE_CODE && fnv(given) === TEACHER_HASH;
+  var teacher = given !== '' && given !== SHARE_CODE && (fnv(given) === TEACHER_HASH || fnv(given) === TEACHER_HASH_ALSO);
   var on = given === SHARE_CODE || teacher;
   window.SHARE_MODE = on;
   window.SHARE_TEACHER = teacher;
